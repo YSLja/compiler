@@ -20,6 +20,12 @@ public class CreateScopePass extends Pass<Void> {
 // 5. Restore the previous scope.
    @Override
    public Void visitFunDecl(FunDecl node) {
+      Scope previous = this.currentscope;
+      this.currentscope = new Scope(previous);
+      super.visitFunDecl(node);
+      node.scope = this.currentscope;
+      this.currentscope = previous;
+      return null;
    }
 // Hint: Struct bodies are evaluated inside their own scope.
 // 1. Create a new Scope whose parent is the current scope.
@@ -27,8 +33,14 @@ public class CreateScopePass extends Pass<Void> {
 // 3. Visit the struct body.
 // 4. Store this scope in node.scope.
 // 5. Restore the previous scope.
-   @Override
+	@Override
 	public Void visitStructDecl(StructDecl node) {
+      Scope previous = this.currentscope;
+      this.currentscope = new Scope(previous);
+      super.visitStructDecl(node);
+      node.scope = this.currentscope;
+      this.currentscope = previous;
+      return null;
 	}
 // Hint: Union bodies behave like structs for scoping.
 // 1. Create a new Scope whose parent is the current scope.
@@ -38,6 +50,12 @@ public class CreateScopePass extends Pass<Void> {
 // 5. Restore the previous scope.
 	@Override
 	public Void visitUnionDecl(UnionDecl node) {
+      Scope previous = this.currentscope;
+      this.currentscope = new Scope(previous);
+      super.visitUnionDecl(node);
+      node.scope = this.currentscope;
+      this.currentscope = previous;
+      return null;
 	}
 // Hint: If statements execute inside a fresh scope.
 // 1. Create a new Scope whose parent is the current scope.
@@ -47,6 +65,12 @@ public class CreateScopePass extends Pass<Void> {
 // 5. Restore the previous scope.
 	@Override
 	public Void visitIfStmt(IfStmt node) {
+      Scope previous = this.currentscope;
+      this.currentscope = new Scope(previous);
+      super.visitIfStmt(node);
+      node.scope = this.currentscope;
+      this.currentscope = previous;
+      return null;
 	}
 // Hint: Loops also introduce a nested scope.
 // 1. Create a new Scope whose parent is the current scope.
@@ -56,6 +80,12 @@ public class CreateScopePass extends Pass<Void> {
 // 5. Restore the previous scope.
    @Override
 	public Void visitWhileStmt(WhileStmt node) {
+      Scope previous = this.currentscope;
+      this.currentscope = new Scope(previous);
+      super.visitWhileStmt(node);
+      node.scope = this.currentscope;
+      this.currentscope = previous;
+      return null;
 	}
 
 }
