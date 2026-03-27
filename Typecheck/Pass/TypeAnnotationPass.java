@@ -44,6 +44,6 @@ public class TypeAnnotationPass extends Pass<Void> {
                   node.name.equals("void") ? new VOID() :
                   new ALIAS(node.name);
 
-
+      return null;
    }
 } 
