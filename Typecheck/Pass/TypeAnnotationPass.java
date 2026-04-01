@@ -39,11 +39,44 @@ public class TypeAnnotationPass extends Pass<Void> {
       if (!isARRAY && !isLIST && node.brackets.list.size() != 0) 
          throw new TypeCheckException("Array has invalid parameters in []");
 
+      //Step 1
       Type basetype = node.name.equals("int") ? new INT() :
                   node.name.equals("string") ? new STRING() :
                   node.name.equals("void") ? new VOID() :
                   new ALIAS(node.name);
 
+      //Step 2
+      for (int i = 0; i < node.pointerCount; i++) {
+	      basetype = new POINTER(basetype);
+      }
+
+      //Step 3
+      if (isLIST && node.brackets.list.size() > 0) {
+	      Type list = basetype;
+	      for (int i = node.brackets.list.size() - 1; i >= 0; i--) {
+		      ArrayList<Type> newlist = new ArrayList<>();
+		      Absyn.ArrayType bracket = (Absyn.ArrayType) node.brackets.list.get(i);
+		      int size = ((Absyn.DecLit) bracket.size).value;
+		      for (int j = 0; j < size; j++) {
+			      newlist.add(list);
+		      }
+		      list = new LIST(newlist);
+	      }
+	      node.typeAnnotation = list;
+	      return null;
+      }
+
+      //Step 4
+      if (isARRAY && node.brackets.list.size() > 0) {
+	      Type array = basetype;
+	      for (int i = node.brackets.list.size() - 1; i >= 0; i--) {
+		      array = new ARRAY(array);
+	      }
+	      node.typeAnnotation = array;
+	      return null;
+      }
+
+      node.typeAnnotation = basetype;
       return null;
    }
 } 
