@@ -95,7 +95,7 @@ public class JudgementsPass extends ScopePass<Void> {
 	   super.visitVarDecl(node);
 
 	   if (!(node.init instanceof Absyn.EmptyExp)) {
-	   	Type declaredType = node.type;
+		Type declaredType = currentscope.getVar(node.name).type;	
 	   	Type initializedType = node.init.typeAnnotation;
 	   	if (!declaredType.canAccept(initializedType)) {
 		   	throw new TypeCheckException("Initialized variable must match the declared variable type!");
