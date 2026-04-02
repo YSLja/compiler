@@ -23,12 +23,12 @@ public class JudgementsPass extends ScopePass<Void> {
 
    @Override
    public Void visitStrLit(Absyn.StrLit node) {
-	   node.typeAnnotation = new INT();
+	   node.typeAnnotation = new STRING();
 	   return null;
    }
 
    @Override
-   public void visitID(Absyn.ID node) {
+   public Void visitID(Absyn.ID node) {
 	   if (currentscope.hasVar(node.value)) {
 		   node.typeAnnotation = currentscope.getVar(node.value).type;
 	   } else if (currentscope.hasFun(node.value)) {
@@ -94,14 +94,58 @@ public class JudgementsPass extends ScopePass<Void> {
    public Void visitVarDecl(Absyn.VarDecl node) {
 	   super.visitVarDecl(node);
 
-	   Type declaredType = node.type;
-	   Type initializedType = node.init.typeAnnotation;
-	   if (!declaredType.canAccept(initializedType)) {
-		   throw new TypeCheckException("Initialized variable must match the declared variable type!");
+	   if (!(node.init instanceof Absyn.EmptyExp)) {
+	   	Type declaredType = node.type;
+	   	Type initializedType = node.init.typeAnnotation;
+	   	if (!declaredType.canAccept(initializedType)) {
+		   	throw new TypeCheckException("Initialized variable must match the declared variable type!");
+	   	}
 	   }
-
 	   return null;
 
    }
+
+
+   //RULE 2
+
+   @Override
+   public Void visitAssignExp(Absyn.AssignExp node) {
+   	super.visitAssignExp(node);
+
+	Type left = node.left.typeAnnotation;
+	Type right = node.right.typeAnnotation;
+	if (!(left.canAccept(right))) {
+		throw new TypeCheckException("Assigned value must match the declared variable type!");
+	}
+
+	node.typeAnnotation = left;
+	return null;
+   }
+
+
+   //RULE 14
+
+   @Override
+   public Void visitUnaryExp(Absyn.UnaryExp node) {
+   	super.visitUnaryExp(node);
+
+	Type expType = node.exp.typeAnnotation;
+
+	if (node.prefix.equals("*")) {
+		if (!(expType instanceof POINTER)) {
+			throw new TypeCheckException("The * operator requires a pointer!");
+		}
+		node.typeAnnotation = ((POINTER) expType).type;
+	} else if (node.prefix.equals("&")) {
+		node.typeAnnotation = new POINTER(expType);
+	} else {
+		if (!(expType instanceof INT)) {
+			throw new TypeCheckException("Unary operators require a number!");
+		}
+		node.typeAnnotation = new INT();
+	}
+
+	return null;
+   }   
 
 }
