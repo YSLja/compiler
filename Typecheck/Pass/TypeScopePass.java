@@ -19,7 +19,9 @@ public class TypeScopePass extends ScopePass<Void> {
         ArrayList<Type> mems = new ArrayList<>();
         if (node.body != null) {
             for (Absyn.Decl m : node.body.list) {
-                mems.add(m.typeAnnotation);
+                // Cast to Parameter (parent of StructMember) to reach the type sub-node
+                // whose typeAnnotation was set by TypeAnnotationPass.
+                mems.add(((Absyn.Parameter) m).type.typeAnnotation);
             }
         }
         TypeSymbol typeSym = new TypeSymbol(node.name, new LIST(mems));
@@ -37,7 +39,9 @@ public class TypeScopePass extends ScopePass<Void> {
         ArrayList<Type> mems = new ArrayList<>();
         if (node.body != null) {
             for (Absyn.Decl m : node.body.list) {
-                mems.add(m.typeAnnotation);
+                // Cast to Parameter (parent of UnionMember) to reach the type sub-node
+                // whose typeAnnotation was set by TypeAnnotationPass.
+                mems.add(((Absyn.Parameter) m).type.typeAnnotation);
             }
         }
         TypeSymbol typeSym = new TypeSymbol(node.name, new OR(mems));
